@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Book-create</title>
+</head>
+<body>
+
+<div>
+    <h1 style="text-align: center">Saved books</h1>
+</div>
+
+<form method="get" action="/book-create">
+    <button type="submit">Create</button>
+</form>
+
+<th:block th:each="book : ${books}">
+    <p>Title: <span th:text="${book.title}"></span></p>
+    <p>Isbn: <span th:text="${book.isbn}"></span></p>
+    <p>Author: <span th:text="${book.author}"></span></p>
+    <p> </p>
+</th:block>
+
+
+</body>
+</html>
