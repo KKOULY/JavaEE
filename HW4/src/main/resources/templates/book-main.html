@@ -1,0 +1,105 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>
+        Book
+    </title>
+</head>
+<body style="display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;">
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+<form id="bookForm">
+    <h1 style="text-align: center">Create book:</h1>
+    Title: <input name="title" placeholder="title">
+    <br />
+    Isbn: <input name="isbn" placeholder="isbn">
+    <br />
+    Author: <input name="author" placeholder="author">
+    <br />
+    <button type="submit">save</button>
+</form>
+<br>
+<div>
+    <h1 style="text-align: center">Find book</h1>
+    <div>
+        <input id="searchInput" placeholder="search">
+        <button id="searchButton">search</button>
+    </div>
+</div>
+
+<div>
+    <h1 style="text-align: center">Books</h1>
+    <table style="font-size: 20px">
+        <thead>
+        <th>title</th>
+        <th>isbn</th>
+        <th>author</th>
+        </thead>
+        <tbody id="booksTable">
+        <tr th:each="book: ${books}">
+            <td th:text="${book.title}"></td>
+            <td th:text="${book.isbn}"></td>
+            <td th:text="${book.author}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    $(function(){
+        $('#bookForm').submit(function(e){
+            e.preventDefault();
+
+            $('#bookResponse').text('');
+            if($(this).find('[name=title]').val() !== "" &&
+                $(this).find('[name=author]').val() !== "" &&
+                $(this).find('[name=isbn]').val() !== "")
+            {
+                $.ajax({
+                    type: 'POST',
+                    url: '/book/save',
+                    dataType: 'json',
+                    data: JSON.stringify({
+                        title: $(this).find('[name=title]').val(),
+                        author: $(this).find('[name=author]').val(),
+                        isbn: $(this).find('[name=isbn]').val()
+                    }),
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('Content-Type', 'application/json')
+                    },
+                    success: function (response) {
+                        let $books = $('#booksTable');
+                        $books.empty();
+                        response.forEach(function(book){
+                            $books.append('<tr><td>' + book.title + '</td>' +
+                                '<td>' +book.isbn  + '</td>' +
+                                '<td>' + book.author+'</td></tr>');
+                        })
+                    }
+                });
+            };
+        });
+        $('#searchButton').click(function () {
+            let $books = $('#booksTable');
+            $books.empty();
+            $.ajax({
+                url: '/book/find',
+                data: "searchField=" + $('#searchInput').val(),
+                success: function (response) {
+                    console.log(response);
+                    response.forEach(function(book){
+                        $books.append('<tr><td>' + book.title + '</td>' +
+                            '<td>' +book.isbn  + '</td>' +
+                            '<td>' + book.author+'</td></tr>');
+                    })
+                }
+            });
+        });
+
+    });
+</script>
+
+</body>
+</html>
