@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Registration</title>
+</head>
+<body style="display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;">
+<form id="bookForm" action="/registration" method="post">
+    Login: <input name="login" placeholder="login">
+    <br />
+    Password: <input name="password" placeholder="password">
+    <br />
+    <button type="submit">Register</button>
+</form>
+<div>
+    <ul th:each="error: ${errors}">
+        <li th:text="${error}"></li>
+    </ul>
+</div>
+</body>
+</html>

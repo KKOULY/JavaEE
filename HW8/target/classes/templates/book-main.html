@@ -9,7 +9,7 @@
     justify-content: center;
     flex-direction: column;">
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-<form id="bookForm" action="/books/save">
+<form id="bookForm" action="/save">
     <h1 style="text-align: center">Create book:</h1>
     Title: <input name="title" placeholder="title">
     <br />
@@ -36,6 +36,7 @@
         <th>title</th>
         <th>isbn</th>
         <th>author</th>
+        <th>action</th>
         </thead>
         <tbody id="booksTable">
         <tr th:each="book: ${books}">
@@ -43,6 +44,7 @@
             <td th:text="${book.title}"></td>
             <td th:text="${book.isbn}"></td>
             <td th:text="${book.author}"></td>
+            <td><a th:href="@{'/addWish/' + ${book.id}}">Add/Delete wish</a></td>
         </tr>
         </tbody>
     </table>
@@ -51,6 +53,10 @@
     <button id="buttonLeft"><</button>
     <button id="buttonRight">></button>
 </div>
+<form id="wishForm" action="/wishList">
+    <button type="submit">Wish List</button>
+</form>
+
 
 <script>
 
@@ -61,7 +67,7 @@
             $('#bookResponse').text('');
             $.ajax({
                 type: 'POST',
-                url: '/books/save',
+                url: '/save',
                 dataType: 'json',
                 data: JSON.stringify({
                     title: $(this).find('[name=title]').val(),
@@ -79,7 +85,8 @@
                             + '</td><td>' + book.title
                             + '</td><td>' +book.isbn
                             + '</td><td>' + book.author
-                            +'</td></tr>');
+                            +'</td><td><a href="/addWish/' +book.id
+                            +'">Add/Delete wish</a></td></tr>');
                     })
                 }
             });
@@ -88,7 +95,7 @@
             let $books = $('#booksTable');
             $books.empty();
             $.ajax({
-                url: '/books/find',
+                url: '/find',
                 data: "searchField=" + $('#searchInput').val(),
                 success: function (response) {
                     console.log(response);
@@ -97,7 +104,8 @@
                             + '</td><td>' + book.title
                             + '</td><td>' +book.isbn
                             + '</td><td>' + book.author
-                            +'</td></tr>');
+                            +'</td><td><a href="/addWish/' +book.id
+                            +'">Add/Delete wish</a></td></tr>');
                     })
                 }
             });
@@ -108,7 +116,7 @@
                 let pageNumber = urlOfPage.split("?")[1].split("&")[0].split("=")[1];
                 if (pageNumber!=="1") {
                     pageNumber--;
-                    window.location.href = "http://localhost:8080/books/?page=" + pageNumber + "&size=10";
+                    window.location.href = "http://localhost:8080/?page=" + pageNumber + "&size=10";
                 }
             }
 
@@ -118,7 +126,7 @@
             let numbOfBooks;
             $.ajax({
                 type: "GET",
-                url: '/books/getAllBooks',
+                url: '/getAllBooks',
                 success: function (response) {
                     console.log(response);
                     numbOfBooks = response;
@@ -131,7 +139,7 @@
                         console.log(pageNumber,pages);
                         if (pages > +pageNumber) {
                             pageNumber++;
-                            window.location.href = "http://localhost:8080/books/?page=" + pageNumber + "&size=10";
+                            window.location.href = "http://localhost:8080/?page=" + pageNumber + "&size=10";
                         }
                     }
                 }
