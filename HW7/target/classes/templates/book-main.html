@@ -1,0 +1,145 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>
+        Create book form
+    </title>
+</head>
+<body style="display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;">
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<form id="bookForm" action="/books/save">
+    <h1 style="text-align: center">Create book:</h1>
+    Title: <input name="title" placeholder="title">
+    <br />
+    Isbn: <input name="isbn" placeholder="isbn">
+    <br />
+    Author: <input name="author" placeholder="author">
+    <br />
+    <button type="submit">Save</button>
+</form>
+<br>
+<div>
+    <h1 style="text-align: center">Find book</h1>
+    <div>
+        <input id="searchInput" placeholder="search">
+        <button id="searchButton">search</button>
+    </div>
+</div>
+
+<div>
+    <h1 style="text-align: center">Books</h1>
+    <table id="tableNum" style="font-size: 20px">
+        <thead>
+        <th>id</th>
+        <th>title</th>
+        <th>isbn</th>
+        <th>author</th>
+        </thead>
+        <tbody id="booksTable">
+        <tr th:each="book: ${books}">
+            <td th:text="${book.id}"></td>
+            <td th:text="${book.title}"></td>
+            <td th:text="${book.isbn}"></td>
+            <td th:text="${book.author}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div>
+    <button id="buttonLeft"><-</button>
+    <button id="buttonRight">-></button>
+</div>
+
+<script>
+
+    $(function(){
+        $('#bookForm').submit(function(e){
+            e.preventDefault();
+
+            $('#bookResponse').text('');
+            $.ajax({
+                type: 'POST',
+                url: '/books/save',
+                dataType: 'json',
+                data: JSON.stringify({
+                    title: $(this).find('[name=title]').val(),
+                    author: $(this).find('[name=author]').val(),
+                    isbn: $(this).find('[name=isbn]').val()
+                }),
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('Content-Type', 'application/json')
+                },
+                success: function (response) {
+                    let $books = $('#booksTable');
+                    $books.empty();
+                    response.forEach(function(book){
+                        $books.append('<tr><td>' + book.id
+                            + '</td><td>' + book.title
+                            + '</td><td>' +book.isbn
+                            + '</td><td>' + book.author
+                            +'</td></tr>');
+                    })
+                }
+            });
+        });
+        $('#searchButton').click(function () {
+            let $books = $('#booksTable');
+            $books.empty();
+            $.ajax({
+                url: '/books/find',
+                data: "searchField=" + $('#searchInput').val(),
+                success: function (response) {
+                    console.log(response);
+                    response.forEach(function(book){
+                        $books.append('<tr><td>' + book.id
+                            + '</td><td>' + book.title
+                            + '</td><td>' +book.isbn
+                            + '</td><td>' + book.author
+                            +'</td></tr>');
+                    })
+                }
+            });
+        });
+        $('#buttonLeft').click(function (){
+            let urlOfPage = window.location.href;
+            if (urlOfPage.includes("page")){
+                let pageNumber = urlOfPage.split("?")[1].split("&")[0].split("=")[1];
+                if (pageNumber!=="1") {
+                    pageNumber--;
+                    window.location.href = "http://localhost:8080/books/?page=" + pageNumber + "&size=10";
+                }
+            }
+
+        })
+        $('#buttonRight').click(function (){
+            let urlOfPage = window.location.href;
+            let numbOfBooks;
+            $.ajax({
+                type: "GET",
+                url: '/books/getAllBooks',
+                success: function (response) {
+                    console.log(response);
+                    numbOfBooks = response;
+                    let pages = Math.ceil(numbOfBooks/10);
+
+                    if (!urlOfPage.includes("page")){
+                        window.location.href =  urlOfPage +"?page=2&size=10";
+                    } else {
+                        let pageNumber = urlOfPage.split("?")[1].split("&")[0].split("=")[1];
+                        console.log(pageNumber,pages);
+                        if (pages > +pageNumber) {
+                            pageNumber++;
+                            window.location.href = "http://localhost:8080/books/?page=" + pageNumber + "&size=10";
+                        }
+                    }
+                }
+            })
+        })
+    });
+
+</script>
+
+</body>
+</html>

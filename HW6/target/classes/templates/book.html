@@ -1,0 +1,31 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Book</title>
+</head>
+<body style="display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;">
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<h3>Book</h3>
+<div>
+    <table style="text-align: center; font-size: 20px">
+        <thead>
+        <th>id</th>
+        <th>title</th>
+        <th>isbn</th>
+        <th>author</th>
+        </thead>
+        <tbody id="booksTable">
+            <td th:text="${book.id}"></td>
+            <td th:text="${book.title}"></td>
+            <td th:text="${book.isbn}"></td>
+            <td th:text="${book.author}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
